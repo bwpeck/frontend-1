@@ -1,55 +1,74 @@
-import React, { Component } from 'react';
-import { Button, Form, FormGroup, Input, } from 'reactstrap';
+import React, { Component } from 'react'
+import { connect } from 'react-redux';
 
 class Login extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
+
+  state = {
+    creds: {
       username: '',
       password: ''
-    };
+    }
   }
 
-  handleInputChange = e => {
-    this.setState({ [e.target.name]: e.target.value });
-  };
 
-  handleLoginSubmit = e => {
-    const user = this.state.username;
-    localStorage.setItem('user', user);
-    window.location.reload();
-  };
+  handleChange = e => {
+    this.setState({
+      creds: {
+        ...this.state.creds,
+        [e.target.name]: e.target.value
+      }
+    });
+  }
+
+  login = e => {
+    e.preventDefault();
+    this.props.login(this.state.creds)
+      .then((id) => {
+        console.log('Login Successful', id)
+        if (id) {
+          this.props.history.push('/protected')
+        } else {
+          alert('No User Found')
+          this.props.history.push('/login')
+        }
+      })
+  }
 
   render() {
     return (
-      <Form className="login">
-        <h3>Login to DevDesk</h3>
-        <div>Please Login</div>
-        <FormGroup>
-          <Input
-            type="text"
-            placeholder="User Name"
-            name="username"
+      <div className='loginWrapper'>
+        <form onSubmit={this.login}>
+          <input
+            input='text'
+            name='username'
+            placeholder='username'
             value={this.state.username}
-            onChange={this.handleInputChange}
+            onChange={this.handleChange}
+            required
           />
-        </FormGroup>
-        <FormGroup>
-          <Input
-            type="password"
-            placeholder="Password"
-            name="password"
+          <input
+            input='text'
+            name='password'
+            placeholder='password'
             value={this.state.password}
-            onChange={this.handleInputChange}
+            onChange={this.handleChange}
+            required
           />
-          <br />
-          <Button color="success" size="large" onClick={this.handleLoginSubmit}>
-            Log In
-          </Button>
-        </FormGroup>
-      </Form>
-    );
+          <button>login</button>
+        </form>
+
+
+      </div>
+    )
   }
 }
 
-export default Login;
+const mapStateToProps = state => {
+  return {
+    fetchingCredentials: state.fetchingCredentials,
+    error: state.error
+  }
+}
+
+
+export default connect(mapStateToProps, ({ login })(Login))
