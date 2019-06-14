@@ -39,7 +39,7 @@ class HelpForm extends Component {
     }
 
     render() {
-        const { StudentName, title, description, categories} = this.state
+        const { StudentName, title, description, categories } = this.state
         return (
             <form
                 className='addHelpForm'
